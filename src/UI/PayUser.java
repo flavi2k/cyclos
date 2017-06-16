@@ -41,7 +41,7 @@ public class PayUser {
 	@FindBy(css = ".inputField.large.rightAligned")
 	private WebElement amount;
 
-	@FindBy(css = ".actionButton")
+	@FindBy(css = ".actionButtonText")
 	private WebElement submitButton;
 
 	@FindBy(css = ".pageHeadingText")
@@ -102,12 +102,15 @@ public class PayUser {
 		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
 	}
 
-	public void selectFromQuickSearch(String option) {
+	public void selectFromQuickSearch(String option) throws InterruptedException {
 		userCheckBox.click();
 		quickSearch.sendKeys(option);
 		wait.until(ExpectedConditions.visibilityOf(userIsSelected));
 		amount.sendKeys("3");
-		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+//		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+//		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".actionButton")));
+		Thread.sleep(500);
+//		driver.findElement(By.cssSelector(".actionButton")).click();
 		submitButton.click();
 		wait.until(ExpectedConditions.visibilityOf(paymentReviewInfo));
 		assertTrue(paymentReviewInfo.getText().equals("Please, review the payment below and click the confirm button"));
