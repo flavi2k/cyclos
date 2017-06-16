@@ -5,11 +5,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Assert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import utilities.Browsers;
@@ -46,23 +46,26 @@ public class PayUser {
 
 	@FindBy(css = ".pageHeadingText")
 	private WebElement paymentReview;
-	
-	@FindBy (css=".inputField.full")
+
+	@FindBy(css = ".inputField.full")
 	private WebElement descriptionInputField;
-	
-	@FindBy (css = ".inputField.large")
+
+	@FindBy(css = ".inputField.large")
 	private WebElement quickSearch;
-	
-	@FindBy (css = ".notificationText.notificationText-singleLine")
+
+	@FindBy(css = ".notificationText.notificationText-singleLine")
 	private WebElement paymentReviewInfo;
-	
+
 	@FindBy(css = ".itemValue.itemValue-itemValueLink.itemValue-label.itemValue-standalone")
 	private WebElement userIsSelected;
-	
-	@FindBy(css=".actionButton.notificationButton")
+
+	@FindBy(css = ".itemValue.itemValue-itemValueText.itemValue-label")
+	private WebElement userIsSelectedFromContact;
+
+	@FindBy(css = ".actionButton.notificationButton")
 	private WebElement notifButton;
-	
-	@FindBy (css=".inputField.full[type='text']")
+
+	@FindBy(css = ".inputField.full[type='text']")
 	private WebElement options;
 
 	public void clickPayUser() {
@@ -98,7 +101,7 @@ public class PayUser {
 		submitButton.click();
 		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
 	}
-	
+
 	public void selectFromQuickSearch(String option) {
 		userCheckBox.click();
 		quickSearch.sendKeys(option);
@@ -112,15 +115,25 @@ public class PayUser {
 		wait.until(ExpectedConditions.visibilityOf(notifButton));
 		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
 	}
-	
-	public void selectD() throws InterruptedException{
+
+	public void selectFromDrop(String option) throws InterruptedException {
 		contactDropDown.click();
-		options.sendKeys("shivam");
-//		Thread.sleep(3000);
-//		wait.until(ExpectedConditions.elementToBeClickable(optionFromDropDown.get(0)));
-		System.out.println(optionFromDropDown.get(0).getText());
-		System.out.println(optionFromDropDown.get(1).getText());
-		optionFromDropDown.get(0).click();
-//		Thread.sleep(7000);
+		options.sendKeys(option);
+		Thread.sleep(500);
+		wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.linkText(option))));
+		driver.findElement(By.linkText(option)).click();
+		wait.until(ExpectedConditions.visibilityOf(userIsSelectedFromContact));
+		assertTrue(userIsSelectedFromContact.isDisplayed());
+
+		amount.sendKeys("4");
+		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+		descriptionInputField.sendKeys("Description for Payment to User");
+		submitButton.click();
+		wait.until(ExpectedConditions.visibilityOf(paymentReview));
+		wait.until(ExpectedConditions.textToBePresentInElement(paymentReview, "Payment review"));
+		Assert.assertTrue(paymentReview.getText().equals("Payment review"));
+		submitButton.click();
+		wait.until(ExpectedConditions.textToBePresentInElement(paymentReviewInfo, "The payment was successful"));
+		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
 	}
 }
