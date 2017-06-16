@@ -129,7 +129,6 @@ public class PayUser {
 		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
 		descriptionInputField.sendKeys("Description for Payment to User");
 		submitButton.click();
-		wait.until(ExpectedConditions.visibilityOf(paymentReview));
 		wait.until(ExpectedConditions.textToBePresentInElement(paymentReview, "Payment review"));
 		Assert.assertTrue(paymentReview.getText().equals("Payment review"));
 		submitButton.click();
