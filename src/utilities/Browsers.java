@@ -12,6 +12,7 @@ public class Browsers {
 	public static WebDriver getDriver() {
 		return driver;
 	}
+	
 	public void setUrlAndBrowser(String browser, String url) {
 		if (browser.equals("Chrome")) {
 			System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
