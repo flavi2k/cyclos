@@ -20,17 +20,20 @@ public class JUnitTest {
 
 	@Before
 	public void setUp() {
+		if (System.getProperty("browser")!=null){
+			browser = System.getProperty("browser"); 
+		}
 		Browsers bro = new Browsers();
 		bro.setUrlAndBrowser(browser, url);
 		driver = Browsers.getDriver();
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		driver.close();
 	}
 
-	@Test()
+	@Test
 	public void test() throws InterruptedException {
 		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
 		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
@@ -40,8 +43,18 @@ public class JUnitTest {
 
 		payUser.clickPayUser();
 		payUser.selectContact();
-		payUser.selectFromDrop("shivam");
-
-		// payUser.selectFromQuickSearch("shivam");
+		payUser.searchContact("Nils");
+//		payUser.selectFromDrop("shivam");
 	}
+
+	/*@Test
+	public void test2() throws InterruptedException {
+		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
+		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
+
+		mainPage.login(username, password);
+		mainPage.verifyLogin(username);
+		payUser.clickPayUser();
+		payUser.selectFromQuickSearch("shivam");
+	}*/
 }

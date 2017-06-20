@@ -84,7 +84,7 @@ public class PayUser {
 		wait.until(ExpectedConditions.elementToBeClickable(optionFromDropDown.get(1)));
 		System.out.println("Element[1]= " + optionFromDropDown.get(2).getText());
 		for (WebElement element : optionFromDropDown) {
-			wait.until(ExpectedConditions.visibilityOf(element));
+			// wait.until(ExpectedConditions.visibilityOf(element));
 			System.out.println("Elements: " + element.getText());
 			if (element.getText().equals(option)) {
 				element.click();
@@ -107,10 +107,10 @@ public class PayUser {
 		quickSearch.sendKeys(option);
 		wait.until(ExpectedConditions.visibilityOf(userIsSelected));
 		amount.sendKeys("3");
-//		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-//		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".actionButton")));
+		// wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+		// wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".actionButton")));
 		Thread.sleep(500);
-//		driver.findElement(By.cssSelector(".actionButton")).click();
+		// driver.findElement(By.cssSelector(".actionButton")).click();
 		submitButton.click();
 		wait.until(ExpectedConditions.visibilityOf(paymentReviewInfo));
 		assertTrue(paymentReviewInfo.getText().equals("Please, review the payment below and click the confirm button"));
@@ -137,5 +137,12 @@ public class PayUser {
 		submitButton.click();
 		wait.until(ExpectedConditions.textToBePresentInElement(paymentReviewInfo, "The payment was successful"));
 		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
+	}
+
+	public void searchContact(String x) throws InterruptedException {
+		contactDropDown.click();
+		driver.findElement(By.cssSelector(".optionListHeader .inputField.full")).sendKeys(x);
+		Thread.sleep(500);
+		driver.findElement(By.linkText(x)).click();
 	}
 }

@@ -10,6 +10,7 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<browser>$browser</browser>
 	</properties>
 	<dependencies>
 		<dependency>
