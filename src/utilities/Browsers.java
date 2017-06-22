@@ -15,17 +15,17 @@ public class Browsers {
 	
 	public void setUrlAndBrowser(String browser, String url) {
 		if (browser.equals("Chrome")) {
-			System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+			System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"//src//resources//chromedriver.exe");
 			driver = new ChromeDriver();
 		}
 		else
 			if (browser.equals("FF")) {
-				System.setProperty("webdriver.gecko.driver", "geckodriver.exe");
+				System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir")+"//src//resources//geckodriver.exe");
 				driver = new FirefoxDriver();
 			}
 		driver.navigate().to(url);
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		driver.manage().window().maximize();
+//		driver.manage().window().maximize();
 	} 
 
 }

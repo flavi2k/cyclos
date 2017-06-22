@@ -30,7 +30,7 @@ public class JUnitTest {
 
 	@After
 	public void tearDown() {
-		driver.close();
+		driver.quit();
 	}
 
 	@Test
@@ -42,9 +42,11 @@ public class JUnitTest {
 		mainPage.verifyLogin(username);
 
 		payUser.clickPayUser();
-		payUser.selectContact();
-		payUser.searchContact("Nils");
-//		payUser.selectFromDrop("shivam");
+		payUser.searchContact("tester","7","description added");
+//		payUser.selectFromQuickSearch("test","7", "Added from quick search");
+		
+		//Thread.sleep(10000);
+//payUser.selectFromDrop("shivam");
 	}
 
 	/*@Test

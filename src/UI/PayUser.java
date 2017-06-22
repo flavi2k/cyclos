@@ -2,19 +2,27 @@ package UI;
 
 import static org.junit.Assert.assertTrue;
 
+import java.security.Timestamp;
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
+import org.omg.CORBA.Current;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.sun.jna.platform.win32.Sspi.TimeStamp;
+
+import utilities.AbstractPage;
 import utilities.Browsers;
 
-public class PayUser {
+public class PayUser extends AbstractPage {
 
 	private WebDriver driver = Browsers.getDriver();
 
@@ -27,10 +35,10 @@ public class PayUser {
 	private WebElement headerText;
 
 	@FindBy(css = ".checkableImage.STYLE_ICON-RADIOBUTTON_CHECKED_ENABLED")
-	private WebElement userCheckBox;
+	private WebElement userRadioButton;
 
 	@FindBy(css = ".checkableImage.STYLE_ICON-RADIOBUTTON_UNCHECKED_ENABLED")
-	private WebElement contactCheckBox;
+	private WebElement contactRadioButton;
 
 	@FindBy(css = ".selectionField.large")
 	private WebElement contactDropDown;
@@ -68,81 +76,150 @@ public class PayUser {
 	@FindBy(css = ".inputField.full[type='text']")
 	private WebElement options;
 
+	@FindBy(css = "tbody tr")
+	List<WebElement> paymentReviewDetails;
+
+	@FindBy(css = ".breadCrumbText")
+	WebElement breadCrumb;
+
 	public void clickPayUser() {
 		payUserButton.click();
 	}
 
-	public void selectContact() {
-		contactCheckBox.click();
+	public void selectContactRadioButton() {
+		contactRadioButton.click();
 		wait.until(ExpectedConditions.visibilityOf(headerText));
 		assertTrue("Payment to user page should be displayed", headerText.getText().equals("Payment to user"));
 	}
 
-	public void selectFromDropDown(String option) throws InterruptedException {
-		contactDropDown.click();
-		Thread.sleep(2000);
-		wait.until(ExpectedConditions.elementToBeClickable(optionFromDropDown.get(1)));
-		System.out.println("Element[1]= " + optionFromDropDown.get(2).getText());
-		for (WebElement element : optionFromDropDown) {
-			// wait.until(ExpectedConditions.visibilityOf(element));
-			System.out.println("Elements: " + element.getText());
-			if (element.getText().equals(option)) {
-				element.click();
-				break;
-			}
-		}
-		amount.sendKeys("4");
-		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-		descriptionInputField.sendKeys("Description for Payment to User");
-		submitButton.click();
-		wait.until(ExpectedConditions.visibilityOf(paymentReview));
-		wait.until(ExpectedConditions.textToBePresentInElement(paymentReview, "Payment review"));
-		Assert.assertTrue(paymentReview.getText().equals("Payment review"));
-		submitButton.click();
-		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
-	}
-
-	public void selectFromQuickSearch(String option) throws InterruptedException {
-		userCheckBox.click();
-		quickSearch.sendKeys(option);
+	public void selectFromQuickSearch(String user, String amount, String description) throws InterruptedException {
+		userRadioButton.click();
+		quickSearch.sendKeys(user);
+		Thread.sleep(900);
+		driver.findElement(By.linkText(user)).click();
 		wait.until(ExpectedConditions.visibilityOf(userIsSelected));
-		amount.sendKeys("3");
-		// wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-		// wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".actionButton")));
-		Thread.sleep(500);
-		// driver.findElement(By.cssSelector(".actionButton")).click();
-		submitButton.click();
-		wait.until(ExpectedConditions.visibilityOf(paymentReviewInfo));
-		assertTrue(paymentReviewInfo.getText().equals("Please, review the payment below and click the confirm button"));
-		submitButton.click();
-		wait.until(ExpectedConditions.visibilityOf(notifButton));
-		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
+		insertAmount(amount);
+		paymentReview(user, amount, description);
 	}
 
-	public void selectFromDrop(String option) throws InterruptedException {
+	public void searchContact(String user, String amount, String description) throws InterruptedException {
+		selectContactRadioButton();
 		contactDropDown.click();
-		options.sendKeys(option);
-		Thread.sleep(500);
-		wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.linkText(option))));
-		driver.findElement(By.linkText(option)).click();
-		wait.until(ExpectedConditions.visibilityOf(userIsSelectedFromContact));
-		assertTrue(userIsSelectedFromContact.isDisplayed());
+		driver.findElement(By.cssSelector(".optionListHeader .inputField.full")).sendKeys(user);
+		Thread.sleep(900);
+		driver.findElement(By.linkText(user)).click();
+		Thread.sleep(900);
+		insertAmount(amount);
+		paymentReview(user, amount, description);
+	}
 
-		amount.sendKeys("4");
+	public void paymentReview(String user, String amount, String description) {
 		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-		descriptionInputField.sendKeys("Description for Payment to User");
+		descriptionInputField.sendKeys(description);
 		submitButton.click();
 		wait.until(ExpectedConditions.textToBePresentInElement(paymentReview, "Payment review"));
-		Assert.assertTrue(paymentReview.getText().equals("Payment review"));
+		assertTrue("Payment review page", paymentReview.getText().equals("Payment review"));
+		assertTrue(paymentReviewInfo.getText().equals("Please, review the payment below and click the confirm button"));
+
+		verifyPaymentDetails(user, amount, description);
+
 		submitButton.click();
 		wait.until(ExpectedConditions.textToBePresentInElement(paymentReviewInfo, "The payment was successful"));
-		assertTrue(paymentReviewInfo.getText().equals("The payment was successful"));
+		assertTrue("Successful payment", paymentReviewInfo.getText().equals("The payment was successful"));
+		verifyTransferDetails(user, amount, description);
 	}
 
-	public void searchContact(String x) throws InterruptedException {
-		contactDropDown.click();
-		driver.findElement(By.cssSelector(".optionListHeader .inputField.full")).sendKeys(x);
-		Thread.sleep(500);
-		driver.findElement(By.linkText(x)).click();
+	public void verifyPaymentDetails(String user, String amount, String description) {
+
+		try {
+			for (int i = 0; i < paymentReviewDetails.size() - 2; i++) {
+				System.out.println(paymentReviewDetails.get(i).getText());
+				if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("From account")) {
+					assertTrue("Member account", paymentReviewDetails.get(i)
+							.findElement(By.cssSelector(" .spacedLabel")).getText().equals("Member account"));
+					System.out.println("\tAssert Member account");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .fieldLabel")).getText()
+						.equals("To")) {
+					assertTrue("User", paymentReviewDetails.get(i).findElement(By.cssSelector(" .spacedLabel"))
+							.getText().equals(user));
+					System.out.println("\tAssert user");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .fieldLabel")).getText()
+						.equals("Payment type")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .spacedLabel")).getText()
+							.equals("Member payment"));
+					System.out.println("\tAssert Member payment");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .fieldLabel")).getText()
+						.equals("Amount")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .spacedLabel")).getText()
+							.equals(amount + ",00 IU's"));
+					System.out.println("\tAssert amount");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .fieldLabel")).getText()
+						.equals("Description")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .spacedLabel")).getText()
+							.equals(description));
+					System.out.println("\tAssert description");
+				}
+			}
+		} catch (NoSuchElementException e) {
+			// TODO Auto-generated catch block
+		}
+		System.out.println("_________Done____________");
+	}
+
+	public void verifyTransferDetails(String user, String amount, String description) {
+		try {
+			for (int i = 1; i < paymentReviewDetails.size(); i++) {
+				System.out.println(paymentReviewDetails.get(i).getText());
+				if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText().equals("Amount")) {
+					assertTrue("Amount", paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField"))
+							.getText().equals(amount + ",00 IU's"));
+					System.out.println("\t\tAssert amount");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("To")) {
+					assertTrue("User", paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals(user));
+					System.out.println("\t\tAssert user");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("Payment type")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals("Member payment"));
+					System.out.println("\t\tAssert Member payment");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("Channel")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals("Main"));
+					System.out.println("\t\tAssert Channel");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("From")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals("Demo user"));
+					System.out.println("\t\tAssert from");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("Description")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals(description));
+					System.out.println("\t\tAssert Description");
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("Transfer number")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals(breadCrumb.getText()));
+					System.out.println("\t\tAssert Transfer number");
+				} /*else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+						.equals("Date")) {
+					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
+							.equals(System.currentTimeMillis()));
+					System.out.println("\t\tAssert Transfer number");
+				}*/
+			}
+		} catch (NoSuchElementException e) {
+			// TODO Auto-generated catch block
+
+		}
+		System.out.println("_________Done____________");
+	}
+
+	public void insertAmount(String am) {
+		amount.sendKeys(am);
 	}
 }
