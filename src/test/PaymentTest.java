@@ -10,7 +10,7 @@ import UI.LoginPage;
 import UI.PayUser;
 import utilities.Browsers;
 
-public class JUnitTest {
+public class PaymentTest {
 
 	private WebDriver driver;
 	private String username = "demo";

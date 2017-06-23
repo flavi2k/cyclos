@@ -92,6 +92,8 @@ public class PayUser extends AbstractPage {
 		userRadioButton.click();
 		quickSearch.sendKeys(user);
 		Thread.sleep(900);
+		
+		//IMPORTANT
 		if (driver.findElements(By.linkText(user)).size() > 1) {
 			driver.findElement(By.linkText(user)).click();
 		}
