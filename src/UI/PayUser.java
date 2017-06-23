@@ -2,13 +2,11 @@ package UI;
 
 import static org.junit.Assert.assertTrue;
 
-import java.security.Timestamp;
-import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
-import org.omg.CORBA.Current;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -16,8 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.sun.jna.platform.win32.Sspi.TimeStamp;
 
 import utilities.AbstractPage;
 import utilities.Browsers;
@@ -96,7 +92,9 @@ public class PayUser extends AbstractPage {
 		userRadioButton.click();
 		quickSearch.sendKeys(user);
 		Thread.sleep(900);
-		driver.findElement(By.linkText(user)).click();
+		if (driver.findElements(By.linkText(user)).size() > 1) {
+			driver.findElement(By.linkText(user)).click();
+		}
 		wait.until(ExpectedConditions.visibilityOf(userIsSelected));
 		insertAmount(amount);
 		paymentReview(user, amount, description);
@@ -168,6 +166,14 @@ public class PayUser extends AbstractPage {
 	}
 
 	public void verifyTransferDetails(String user, String amount, String description) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYY HH:mm");
+		Calendar calendar = Calendar.getInstance();
+		TimeZone gmtTime = TimeZone.getTimeZone("GMT");
+		sdf.setTimeZone(gmtTime);
+		String strDate = sdf.format((calendar.getTime()));
+		System.out.println(strDate);
+
 		try {
 			for (int i = 1; i < paymentReviewDetails.size(); i++) {
 				System.out.println(paymentReviewDetails.get(i).getText());
@@ -205,12 +211,12 @@ public class PayUser extends AbstractPage {
 					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
 							.equals(breadCrumb.getText()));
 					System.out.println("\t\tAssert Transfer number");
-				} /*else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
+				} else if (paymentReviewDetails.get(i).findElement(By.cssSelector(" .formLabel")).getText()
 						.equals("Date")) {
 					assertTrue(paymentReviewDetails.get(i).findElement(By.cssSelector(" .formField")).getText()
-							.equals(System.currentTimeMillis()));
-					System.out.println("\t\tAssert Transfer number");
-				}*/
+							.equals(strDate));
+					System.out.println("\t\tAssert Date \t");
+				}
 			}
 		} catch (NoSuchElementException e) {
 			// TODO Auto-generated catch block

@@ -34,7 +34,7 @@ public class JUnitTest {
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	public void testUniqueUserFromContact() throws InterruptedException {
 		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
 		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
 
@@ -42,21 +42,40 @@ public class JUnitTest {
 		mainPage.verifyLogin(username);
 
 		payUser.clickPayUser();
-		payUser.searchContact("tester","7","description added");
-//		payUser.selectFromQuickSearch("test","7", "Added from quick search");
-		
-		//Thread.sleep(10000);
-//payUser.selectFromDrop("shivam");
+		payUser.searchContact("shivam","7","description added");
 	}
 
-	/*@Test
-	public void test2() throws InterruptedException {
+	@Test
+	public void testUniqueUserFromQuickSearch() throws InterruptedException {
 		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
 		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
 
 		mainPage.login(username, password);
 		mainPage.verifyLogin(username);
 		payUser.clickPayUser();
-		payUser.selectFromQuickSearch("shivam");
-	}*/
+		payUser.selectFromQuickSearch("shivam","7", "Added from quick search");
+	}
+	
+	@Test
+	public void testMultipleUsersFromContact() throws InterruptedException {
+		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
+		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
+		
+		mainPage.login(username, password);
+		mainPage.verifyLogin(username);
+		
+		payUser.clickPayUser();
+		payUser.searchContact("tester","7","description added");
+	}
+	
+	@Test
+	public void testMultipleUsersFromQuickSearch() throws InterruptedException {
+		
+		LoginPage mainPage = PageFactory.initElements(driver, LoginPage.class);
+		PayUser payUser = PageFactory.initElements(driver, PayUser.class);
+		mainPage.login(username, password);
+		mainPage.verifyLogin(username);
+		payUser.clickPayUser();
+		payUser.selectFromQuickSearch("tester","7", "Added from quick search");
+	}
 }
