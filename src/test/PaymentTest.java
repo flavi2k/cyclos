@@ -23,8 +23,8 @@ public class PaymentTest {
 		if (System.getProperty("browser")!=null){
 			browser = System.getProperty("browser"); 
 		}
-		Browsers bro = new Browsers();
-		bro.setUrlAndBrowser(browser, url);
+//		Browsers bro = new Browsers();
+		Browsers.setUrlAndBrowser(browser, url);
 		driver = Browsers.getDriver();
 	}
 

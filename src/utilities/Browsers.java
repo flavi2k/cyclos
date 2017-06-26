@@ -8,12 +8,15 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class Browsers {
 	private static WebDriver driver;
+	private Browsers() {
+		
+	}
 
 	public static WebDriver getDriver() {
 		return driver;
 	}
 	
-	public void setUrlAndBrowser(String browser, String url) {
+	public static void setUrlAndBrowser(String browser, String url) {
 		if (browser.equals("Chrome")) {
 			System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"//src//resources//chromedriver.exe");
 			driver = new ChromeDriver();

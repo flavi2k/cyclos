@@ -93,7 +93,7 @@ public class PayUser extends AbstractPage {
 		quickSearch.sendKeys(user);
 		Thread.sleep(900);
 		
-		//IMPORTANT
+		//IMPORTANT 'driver.findElements(By.linkText(user)).size() > 1' verifies if an element is present
 		if (driver.findElements(By.linkText(user)).size() > 1) {
 			driver.findElement(By.linkText(user)).click();
 		}
@@ -162,7 +162,6 @@ public class PayUser extends AbstractPage {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			// TODO Auto-generated catch block
 		}
 		System.out.println("_________Done____________");
 	}
@@ -221,7 +220,6 @@ public class PayUser extends AbstractPage {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			// TODO Auto-generated catch block
 
 		}
 		System.out.println("_________Done____________");

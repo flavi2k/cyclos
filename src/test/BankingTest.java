@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 
@@ -28,8 +27,8 @@ public class BankingTest {
 		if (System.getProperty("browser") != null) {
 			browser = System.getProperty("browser");
 		}
-		Browsers bro = new Browsers();
-		bro.setUrlAndBrowser(browser, url);
+//		Browsers bro = new Browsers();
+		Browsers.setUrlAndBrowser(browser, url);
 		driver = Browsers.getDriver();
 	}
 

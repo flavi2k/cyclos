@@ -37,16 +37,5 @@ public class Banking {
 		System.out.println(page);
 		System.out.println(expectedTitle);
 		Assert.assertTrue(expectedTitle.equals(title.getText()));
-		
-		
-		
-		/*Thread.sleep(2000);
-		System.out.println(leftMenuLinks.size());
-		for (WebElement element : leftMenuLinks) {
-			System.out.print(element.getText()+ ",");
-			element.click();
-			wait.until(ExpectedConditions.visibilityOf(title));
-			System.out.println(""+title.getText());
-		}*/
 	}
 }
